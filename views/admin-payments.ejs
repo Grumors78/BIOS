@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payments — Admin</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  .wrap { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+  .back-link { display: inline-block; font-size: 0.85rem; color: var(--navy); opacity: 0.65; margin-bottom: 1.5rem; }
+  h1 { font-size: 1.7rem; border-bottom: 3px double var(--navy); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+  .summary { font-size: 0.85rem; opacity: 0.6; margin-bottom: 1.5rem; }
+  table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; font-size: 0.85rem; }
+  th, td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--rule); }
+  th { background: var(--parchment-dim); font-family: 'Inter', sans-serif; font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .empty { text-align: center; padding: 3rem; opacity: 0.5; font-size: 0.9rem; }
+  .note { font-size: 0.78rem; opacity: 0.55; margin-top: 1.5rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="/admin">&#8592; Dashboard</a>
+  <h1>Payments</h1>
+  <p class="summary"><%= payments.length %> recorded payment<%= payments.length === 1 ? '' : 's' %></p>
+
+  <% if (payments.length === 0) { %>
+    <div class="empty">No payments recorded yet on this server instance.</div>
+  <% } else { %>
+    <table>
+      <thead>
+        <tr><th>Email</th><th>Department</th><th>Paid at</th></tr>
+      </thead>
+      <tbody>
+        <% payments.forEach(p => { %>
+          <tr>
+            <td><%= p.email %></td>
+            <td><%= (deptNames[p.department] && deptNames[p.department].name) || p.department %></td>
+            <td><%= new Date(p.paidAt).toLocaleString() %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+<p class="note">This list reflects payments recorded in the database. For the complete authoritative transaction history, see your Flutterwave dashboard directly.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Departmental Assignment Register</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  .wrap { max-width: 980px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+  .masthead { text-align: center; padding-bottom: 3rem; border-bottom: 3px double var(--navy); margin-bottom: 3.5rem; }
+  .eyebrow { font-family: 'Inter', sans-serif; font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--brass); font-weight: 600; display: block; margin-bottom: 0.9rem; }
+  .masthead h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; }
+  .masthead p { margin-top: 1rem; font-size: 1.02rem; color: rgba(42, 38, 32, 0.7); max-width: 34rem; margin-left: auto; margin-right: auto; }
+  .register { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.1rem; }
+  .entry { background: #fff; border: 1px solid var(--rule); border-left: 5px solid var(--dept-color, var(--navy)); border-radius: 4px; padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; transition: transform 0.18s ease, box-shadow 0.18s ease, border-left-width 0.18s ease; }
+  .entry:hover, .entry:focus-visible { transform: translateX(4px); box-shadow: 0 10px 30px -12px rgba(27, 42, 74, 0.25); border-left-width: 9px; }
+  .entry-main { display: flex; align-items: baseline; gap: 1rem; }
+  .entry-index { font-family: 'Lora', serif; font-style: italic; color: var(--dept-color, var(--brass)); font-size: 0.95rem; min-width: 1.6rem; }
+  .entry-name { font-family: 'Lora', serif; font-size: 1.35rem; font-weight: 600; color: var(--navy); }
+  .entry-desc { font-size: 0.88rem; color: rgba(42, 38, 32, 0.55); display: block; margin-top: 0.2rem; font-family: 'Inter', sans-serif; }
+  .entry-arrow { font-size: 1.3rem; color: var(--dept-color, var(--navy)); flex-shrink: 0; }
+  .entry-fee { font-size: 0.75rem; color: rgba(42,38,32,0.45); font-family: 'Inter', sans-serif; margin-top: 0.15rem; }
+  footer { text-align: center; margin-top: 4rem; font-size: 0.8rem; color: rgba(42, 38, 32, 0.45); }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to department list</a>
+<div class="wrap">
+  <header class="masthead">
+    <span class="eyebrow">Assignment Submission Portal</span>
+    <h1>Departmental Register</h1>
+    <p>Select your department below. A one-time access fee of &#8358;500 applies per department.</p>
+  </header>
+
+  <main id="main">
+    <ul class="register">
+      <li><a class="entry" href="/pharmacy" style="--dept-color:#8A5A3B">
+        <span class="entry-main"><span class="entry-index">I.</span>
+          <span><span class="entry-name">Pharmacy</span><span class="entry-desc">Assignment submissions &amp; records</span></span>
+        </span><span class="entry-arrow">&#8594;</span>
+      </a></li>
+      <li><a class="entry" href="/medicine" style="--dept-color:#1B2A4A">
+        <span class="entry-main"><span class="entry-index">II.</span>
+          <span><span class="entry-name">Medicine</span><span class="entry-desc">Assignment submissions &amp; records</span></span>
+        </span><span class="entry-arrow">&#8594;</span>
+      </a></li>
+      <li><a class="entry" href="/agriculture" style="--dept-color:#6B7D5E">
+        <span class="entry-main"><span class="entry-index">III.</span>
+          <span><span class="entry-name">Agriculture</span><span class="entry-desc">Assignment submissions &amp; records</span></span>
+        </span><span class="entry-arrow">&#8594;</span>
+      </a></li>
+      <li><a class="entry" href="/medlab" style="--dept-color:#7A3B4A">
+        <span class="entry-main"><span class="entry-index">IV.</span>
+          <span><span class="entry-name">Medical Laboratory Science</span><span class="entry-desc">Assignment submissions &amp; records</span></span>
+        </span><span class="entry-arrow">&#8594;</span>
+      </a></li>
+      <li><a class="entry" href="/biochemistry" style="--dept-color:#B8935F">
+        <span class="entry-main"><span class="entry-index">V.</span>
+          <span><span class="entry-name">Biochemistry</span><span class="entry-desc">Assignment submissions &amp; records</span></span>
+        </span><span class="entry-arrow">&#8594;</span>
+      </a></li>
+    </ul>
+  </main>
+
+  <footer>Departmental Assignment Register</footer>
+</div>
+</body>
+</html>

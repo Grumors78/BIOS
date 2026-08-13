@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= deptName %> — Departmental Register</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/dept-style.css">
+<style>:root { --dept-color: <%= deptColor %>; }</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to assignments</a>
+<div class="wrap">
+  <a class="back-link" href="/">&#8592; All departments</a>
+
+  <header class="dept-header">
+    <div>
+      <span class="dept-eyebrow">Department Register &middot; Access granted</span>
+      <h1><%= deptName %></h1>
+    </div>
+    <span class="ledger-count" id="assignment-count">Loading&hellip;</span>
+  </header>
+
+  <main id="main">
+    <div class="gallery" id="gallery"></div>
+    <div id="empty-state">
+      <h2>No assignments on file yet</h2>
+      <p>Check back soon — the department will add assignment images shortly.</p>
+    </div>
+  </main>
+</div>
+
+<div class="lightbox-overlay" id="lightbox">
+  <img id="lightbox-img" src="" alt="">
+  <p class="lightbox-caption" id="lightbox-caption"></p>
+  <div class="lightbox-actions">
+    <a id="lightbox-download" href="" download target="_blank" rel="noopener">&#8595; Download</a>
+    <button type="button" class="lightbox-close" id="lightbox-close">Close</button>
+  </div>
+</div>
+
+<script>
+  const department = <%- JSON.stringify(dept) %>;
+
+  async function loadGallery() {
+    const grid = document.getElementById('gallery');
+    const empty = document.getElementById('empty-state');
+    const count = document.getElementById('assignment-count');
+
+    let files = [];
+    try {
+      const res = await fetch(`/${department}/api/images`, { credentials: 'same-origin' });
+      if (res.status === 403) {
+        window.location.href = `/${department}`;
+        return;
+      }
+      files = await res.json();
+    } catch (err) {
+      files = [];
+    }
+
+    if (!files || files.length === 0) {
+      empty.style.display = 'block';
+      count.textContent = '0 on file';
+      return;
+    }
+
+    count.textContent = files.length + (files.length === 1 ? ' on file' : ' on file');
+
+    files.forEach((file, i) => {
+      const card = document.createElement('figure');
+      card.className = 'plate';
+
+      const img = document.createElement('img');
+      img.src = file;
+      img.loading = 'lazy';
+      img.alt = 'Submitted assignment ' + (i + 1);
+      img.tabIndex = 0;
+
+      const cap = document.createElement('figcaption');
+      const name = file.split('/').pop();
+      const label = 'Entry ' + String(i + 1).padStart(2, '0') + '  —  ' + name;
+      cap.textContent = label;
+
+      const openLightbox = () => {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const lightboxDownload = document.getElementById('lightbox-download');
+        lightboxImg.src = file;
+        lightboxImg.alt = img.alt;
+        lightboxCaption.textContent = label;
+        lightboxDownload.href = file;
+        lightboxDownload.setAttribute('download', name);
+        lightbox.classList.add('open');
+      };
+
+      img.addEventListener('click', openLightbox);
+      img.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox();
+        }
+      });
+
+      card.appendChild(img);
+      card.appendChild(cap);
+      grid.appendChild(card);
+    });
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+  document.getElementById('lightbox').addEventListener('click', (e) => {
+    if (e.target.id === 'lightbox') closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  document.addEventListener('DOMContentLoaded', loadGallery);
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= deptName %> — Access Required</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/dept-style.css">
+<style>:root { --dept-color: <%= deptColor %>; }</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to payment form</a>
+<div class="wrap">
+  <a class="back-link" href="/">&#8592; All departments</a>
+
+  <header class="dept-header">
+    <div>
+      <span class="dept-eyebrow">Department Register</span>
+      <h1><%= deptName %></h1>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="paywall-card">
+      <h2>Access required</h2>
+      <p class="fee">&#8358;500 one-time fee for <%= deptName %></p>
+      <p class="helper">Enter your email to continue to secure payment. Once paid, you'll have permanent access to this department's assignments on this device.</p>
+
+      <form class="paywall-form" id="pay-form">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        <p class="pay-error" id="pay-error"></p>
+        <button type="submit" class="pay-btn" id="pay-btn">Pay &#8358;500 &amp; unlock</button>
+      </form>
+
+      <button type="button" class="recover-toggle" id="recover-toggle">Already paid on another device? Recover access</button>
+
+      <div class="recover-panel" id="recover-panel" style="display:none;">
+        <form class="paywall-form" id="recover-request-form">
+          <label for="recover-email">Email you paid with</label>
+          <input type="email" id="recover-email" name="email" placeholder="you@example.com" required>
+          <p class="pay-error" id="recover-error"></p>
+          <p class="recover-note" id="recover-note" style="display:none;"></p>
+          <button type="submit" class="pay-btn secondary-btn" id="recover-request-btn">Send access code</button>
+        </form>
+
+        <form class="paywall-form" id="recover-verify-form" style="display:none;">
+          <label for="recover-code">6-digit code from your email</label>
+          <input type="text" id="recover-code" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="123456" required>
+          <p class="pay-error" id="verify-error"></p>
+          <button type="submit" class="pay-btn secondary-btn" id="recover-verify-btn">Verify &amp; unlock</button>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+
+<style>
+  .recover-toggle {
+    display: block;
+    margin: 1.2rem auto 0;
+    background: none;
+    border: none;
+    color: var(--dept-color, var(--navy));
+    font-size: 0.85rem;
+    text-decoration: underline;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .recover-panel {
+    margin-top: 1.4rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--rule);
+    text-align: left;
+  }
+  .secondary-btn {
+    background: transparent;
+    border: 1.5px solid var(--dept-color, var(--navy));
+    color: var(--dept-color, var(--navy));
+  }
+  .recover-note {
+    font-size: 0.82rem;
+    color: var(--sage);
+  }
+</style>
+
+<script>
+  const form = document.getElementById('pay-form');
+  const btn = document.getElementById('pay-btn');
+  const errorEl = document.getElementById('pay-error');
+  const department = <%- JSON.stringify(dept) %>;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Redirecting to payment…';
+
+    const email = document.getElementById('email').value.trim();
+
+    try {
+      const res = await fetch('/payment/initialize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ department, email })
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.authorization_url) {
+        throw new Error(data.error || 'Could not start payment.');
+      }
+
+      window.location.href = data.authorization_url;
+    } catch (err) {
+      errorEl.textContent = err.message || 'Something went wrong. Please try again.';
+      errorEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Pay ₦500 & unlock';
+    }
+  });
+
+  // ---- Recovery flow ----
+  const recoverToggle = document.getElementById('recover-toggle');
+  const recoverPanel = document.getElementById('recover-panel');
+  const requestForm = document.getElementById('recover-request-form');
+  const verifyForm = document.getElementById('recover-verify-form');
+  const requestBtn = document.getElementById('recover-request-btn');
+  const verifyBtn = document.getElementById('recover-verify-btn');
+  const recoverError = document.getElementById('recover-error');
+  const verifyError = document.getElementById('verify-error');
+  const recoverNote = document.getElementById('recover-note');
+
+  let recoveryEmail = '';
+
+  recoverToggle.addEventListener('click', () => {
+    const showing = recoverPanel.style.display !== 'none';
+    recoverPanel.style.display = showing ? 'none' : 'block';
+    recoverToggle.textContent = showing
+      ? 'Already paid on another device? Recover access'
+      : 'Hide recovery form';
+  });
+
+  requestForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    recoverError.style.display = 'none';
+    requestBtn.disabled = true;
+    requestBtn.textContent = 'Sending…';
+
+    recoveryEmail = document.getElementById('recover-email').value.trim();
+
+    try {
+      const res = await fetch('/recover/request-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ department, email: recoveryEmail })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Something went wrong.');
+      }
+
+      recoverNote.textContent = data.message;
+      recoverNote.style.display = 'block';
+      requestForm.style.display = 'none';
+      verifyForm.style.display = 'block';
+    } catch (err) {
+      recoverError.textContent = err.message || 'Something went wrong. Please try again.';
+      recoverError.style.display = 'block';
+    } finally {
+      requestBtn.disabled = false;
+      requestBtn.textContent = 'Send access code';
+    }
+  });
+
+  verifyForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    verifyError.style.display = 'none';
+    verifyBtn.disabled = true;
+    verifyBtn.textContent = 'Verifying…';
+
+    const code = document.getElementById('recover-code').value.trim();
+
+    try {
+      const res = await fetch('/recover/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ department, email: recoveryEmail, code })
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'That code is incorrect or has expired.');
+      }
+
+      window.location.href = data.redirect;
+    } catch (err) {
+      verifyError.textContent = err.message || 'Something went wrong. Please try again.';
+      verifyError.style.display = 'block';
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Verify & unlock';
+    }
+  });
+</script>
+</body>
+</html>

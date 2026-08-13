@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Departmental Register</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  .wrap { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem; }
+  h1 { font-size: 1.8rem; }
+  .logout-btn { background: none; border: 1px solid var(--rule); color: var(--navy); padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.85rem; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .logout-btn:hover { background: var(--parchment-dim); }
+  .dept-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+  .dept-row { background: #fff; border: 1px solid var(--rule); border-left: 5px solid var(--dept-color, var(--navy)); border-radius: 4px; padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+  .dept-row-name { font-family: 'Lora', serif; font-size: 1.15rem; font-weight: 600; color: var(--navy); }
+  .dept-row-count { font-size: 0.85rem; opacity: 0.6; margin-top: 0.15rem; }
+  .manage-btn { background: var(--dept-color, var(--navy)); color: #fff; padding: 0.55rem 1.1rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+  .site-link { display: inline-block; margin-top: 2.5rem; font-size: 0.85rem; opacity: 0.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top-bar">
+    <h1>Admin Dashboard</h1>
+    <form method="POST" action="/admin/logout">
+      <button type="submit" class="logout-btn">Log out</button>
+    </form>
+  </div>
+
+  <ul class="dept-list">
+    <% depts.forEach(d => { %>
+      <li class="dept-row" style="--dept-color: <%= d.color %>">
+        <div>
+          <div class="dept-row-name"><%= d.name %></div>
+          <div class="dept-row-count"><%= d.count %> assignment<%= d.count === 1 ? '' : 's' %> on file</div>
+        </div>
+        <a class="manage-btn" href="/admin/<%= d.slug %>">Manage</a>
+      </li>
+    <% }) %>
+  </ul>
+
+  <a class="site-link" href="/admin/payments">View payment records &#8594;</a><br>
+  <a class="site-link" href="/">&#8592; View public site</a>
+</div>
+</body>
+</html>

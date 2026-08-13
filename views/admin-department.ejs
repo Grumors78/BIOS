@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= deptName %> — Admin</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  :root { --dept-color: <%= deptColor %>; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+  .back-link { display: inline-block; font-size: 0.85rem; color: var(--navy); opacity: 0.65; margin-bottom: 1.5rem; }
+  .back-link:hover { opacity: 1; }
+  h1 { font-size: 1.7rem; border-bottom: 3px double var(--dept-color); padding-bottom: 1rem; margin-bottom: 2rem; }
+
+  .upload-card { background: #fff; border: 1px solid var(--rule); border-top: 4px solid var(--dept-color); border-radius: 6px; padding: 1.5rem; margin-bottom: 2.5rem; }
+  .upload-card h2 { font-size: 1.05rem; margin-bottom: 0.8rem; }
+  .upload-card input[type="file"] { display: block; width: 100%; margin-bottom: 1rem; font-size: 0.9rem; }
+  .upload-btn { background: var(--dept-color); color: #fff; border: none; padding: 0.7rem 1.3rem; border-radius: 4px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .upload-note { font-size: 0.8rem; opacity: 0.6; margin-top: 0.6rem; }
+  .upload-error { color: #a33; font-size: 0.85rem; margin-bottom: 1rem; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.25rem; }
+  .plate { background: #fff; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .plate img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: var(--parchment-dim); }
+  .plate-footer { padding: 0.6rem 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+  .plate-name { font-size: 0.72rem; opacity: 0.6; word-break: break-all; }
+  .delete-btn { background: none; border: 1px solid #c66; color: #a33; font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+  .delete-btn:hover { background: #fce; }
+  .empty { text-align: center; padding: 3rem; opacity: 0.5; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="/admin">&#8592; All departments</a>
+  <h1><%= deptName %></h1>
+
+  <div class="upload-card">
+    <h2>Upload assignment images</h2>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <p class="upload-error">Upload failed. Please check the file types and try again.</p>
+    <% } %>
+    <form method="POST" action="/admin/<%= dept %>/upload" enctype="multipart/form-data">
+      <input type="file" name="images" accept="image/*" multiple required>
+      <button type="submit" class="upload-btn">Upload</button>
+    </form>
+    <p class="upload-note">You can select multiple images at once. Accepted: JPG, PNG, GIF, WEBP, BMP.</p>
+  </div>
+
+  <% if (images.length === 0) { %>
+    <div class="empty">No assignments uploaded yet for this department.</div>
+  <% } else { %>
+    <div class="grid">
+      <% images.forEach(img => { %>
+        <figure class="plate">
+          <img src="<%= img.url %>" alt="<%= img.filename %>" loading="lazy">
+          <div class="plate-footer">
+            <span class="plate-name"><%= img.filename %></span>
+            <form method="POST" action="/admin/<%= dept %>/delete" onsubmit="return confirm('Delete this image?');">
+              <input type="hidden" name="publicId" value="<%= img.publicId %>">
+              <button type="submit" class="delete-btn">Delete</button>
+            </form>
+          </div>
+        </figure>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+</body>
+</html>
